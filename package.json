@@ -1,0 +1,20 @@
+{
+  "name": "nodejs_purolator_api",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "soap": "^1.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.37.0",
+    "nodemon": "^2.0.22"
+  }
+}

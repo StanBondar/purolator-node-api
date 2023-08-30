@@ -1,10 +1,6 @@
-import soap from 'soap';
-import * as config from './config.js'
-import { invoke } from "./helpers.js";
-
-// const KEY = "1c3d5cf62bda4648a370f5b3cd4edff0";
-// const PASS = "(Hxl9{LN";
-// const ACCOUNT_NUMBER = "9999999999";
+const soap = require('soap');
+const config = require('./config.js')
+const { invoke } = require("./helpers.js");
 
 const prefix = (obj = {}, frontmatter = '') => {
   const reassignKeyValue = (input) =>
@@ -22,7 +18,7 @@ const prefix = (obj = {}, frontmatter = '') => {
   return reassignKeyValue(obj);
 };
 
-export class PurolatorAPI {
+class PurolatorAPI {
   constructor(key, password, isSandbox = true) {
     this.version = 2;
     this.namespace = 'ns1';
@@ -59,8 +55,12 @@ export class PurolatorAPI {
     return this.$req('Shipping.Create', body);
   }
 
-  async estimateRate(body) {
-    return this.$req('Estimating.Quick', body);
+  async estimateRate(body, serviceCode) {
+    const availableRates = await this.$req('Estimating.Quick', body);
+    if(serviceCode) {
+      return availableRates.find(rate => rate.ServiceID === serviceCode);
+    }
+    return availableRates;
   }
 
   async retrieveDocuments(body) {
@@ -99,100 +99,4 @@ export class PurolatorAPI {
   }
 }
 
-// const client = new PurolatorAPI(KEY, PASS)
-
-// client.estimateRate({
-//     BillingAccountNumber: ACCOUNT_NUMBER,
-//     SenderPostalCode: "L4W5M8",
-//     ReceiverAddress: {
-//       City: "Burnaby",
-//       Province: "BC",
-//       Country: "CA",
-//       PostalCode: "V5C5A9",
-//     },
-//     PackageType: "CustomerPackaging",
-//     TotalWeight: {
-//       Value: 10,
-//       WeightUnit: "lb",
-//     },
-//   }
-// )
-
-// client.createShipment({
-//       "Shipment": {
-//         "SenderInformation": {
-//           "Address": {
-//             "Name": "Sender Name",
-//             "Company": "United Chargers",
-//             "Department": "Web Services",
-//             "StreetNumber": "1234",
-//             "StreetName": "25 POLLARD",
-//             "StreetType": "Street",
-//             "City": "RICHMOND HILL",
-//             "Province": "ON",
-//             "Country": "CA",
-//             "PostalCode": "L4B 1A8",
-//             "PhoneNumber": {
-//               "CountryCode": "1",
-//               "AreaCode": "905",
-//               "Phone": "5555555"
-//             }
-//           }
-//         },
-//         "ReceiverInformation": {
-//           "Address": {
-//             "Name": "Receiver Name",
-//             "Company": "Purolator Ltd",
-//             "Department": "Web Services",
-//             "StreetNumber": "2245",
-//             "StreetName": "Suite 509, 14-1860 Appleby Line",
-//             "StreetType": "Drive",
-//             "City": "MISSISSAUGA",
-//             "Province": "ON",
-//             "Country": "CA",
-//             "PostalCode": "L5N3B5",
-//             "PhoneNumber": {
-//               "CountryCode": "1",
-//               "AreaCode": "604",
-//               "Phone": "2982181"
-//             }
-//           }
-//         },
-//         "PackageInformation": {
-//           "ServiceID": "PurolatorExpressEnvelope",
-//           "TotalWeight": {
-//             "Value": 1,
-//             "WeightUnit": "lb"
-//           },
-//           "TotalPieces": 1,
-//         },
-//         "PaymentInformation": {
-//           "PaymentType": "Sender",
-//           "RegisteredAccountNumber": ACCOUNT_NUMBER,
-//           "BillingAccountNumber": ACCOUNT_NUMBER
-//         },
-//         "PickupInformation": {
-//           "PickupType": "DropOff"
-//         },
-//         "TrackingReferenceInformation": {
-//           "Reference1": "Reference For Shipment"
-//         }
-//       },
-//       "PrinterType": "Thermal"
-//     });
-
-// client.retrieveDocuments({
-//   "DocumentCriterium": {
-//     "DocumentCriteria": {
-//       "PIN": {
-//         "Value": "329037227900"
-//       },
-//       "DocumentTypes": {
-//         "DocumentType": "DomesticBillOfLading"
-//       }
-//     }
-//   },
-//   "OutputType": "ZPL",
-//   "Synchronous": true,
-//   "SynchronousSpecified": true
-// })
+module.exports = { PurolatorAPI };

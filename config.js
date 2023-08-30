@@ -1,4 +1,4 @@
-import path from 'path';
+const path = require('path');
 
 const datatypes = 'http://purolator.com/pws/datatypes';
 
@@ -34,12 +34,13 @@ const responses = {
 const getWSDL = (n, isSandbox) =>
   path.join(
     process.cwd(),
+    'node_modules/nodejs_purolator_api/',
     isSandbox
       ? `./wsdl/Development/${n}Service.wsdl`
       : `./wsdl/Production/${n}Service.wsdl`
   );
 
-  export {
+  module.exports = {
     datatypes,
     responses,
     getWSDL

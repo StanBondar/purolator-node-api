@@ -88,6 +88,7 @@ class PurolatorAPI {
       .then((e) => this.$appendHeaders(e, apiVersion))
       .then(invoke(`${method}Async`, payload))
       .then(resp => {
+        console.log('Stringified response', JSON.stringify(resp))
         const [deepKey, deeperKey] = responseKey.split('.')
         const response = resp[0][deepKey][deeperKey];
         console.log(`${method}:`, response);

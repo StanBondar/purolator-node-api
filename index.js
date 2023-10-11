@@ -67,6 +67,10 @@ class PurolatorAPI {
     return this.$req('ShippingDocuments.Retrieve', body);
   }
 
+  async validateAddress(body) {
+    return this.$req('ServiceAvailability.Validate', body);
+  }
+
   async $req(serviceName, body) {
     const payload = prefix(body, this.namespace);
     const name = config.getWSDL(serviceName.split('.')[0], this.isSandbox);
@@ -88,7 +92,6 @@ class PurolatorAPI {
       .then((e) => this.$appendHeaders(e, apiVersion))
       .then(invoke(`${method}Async`, payload))
       .then(resp => {
-        console.log('Stringified response', JSON.stringify(resp))
         const [deepKey, deeperKey] = responseKey.split('.')
         const response = resp[0][deepKey][deeperKey];
         console.log(`${method}:`, response);

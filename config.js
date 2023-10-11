@@ -29,6 +29,13 @@ const responses = {
       apiVersion: "1.3"
     }
   },
+  ServiceAvailability: {
+    Validate: {
+      method: 'ValidateCityPostalCodeZip',
+      responseKey: 'SuggestedAddresses.SuggestedAddress',
+      apiVersion: "2.0"
+    }
+  },
 };
 
 const getWSDL = (n, isSandbox) =>

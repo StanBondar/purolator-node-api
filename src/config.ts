@@ -1,8 +1,18 @@
-const path = require('path');
+import path from 'path';
 
 const datatypes = 'http://purolator.com/pws/datatypes';
 
-const responses = {
+interface IResponseConfig {
+  [key: string]: {
+    [key: string]: {
+      method: string;
+      responseKey: string;
+      apiVersion: string;
+    };
+  };
+}
+
+const responses: IResponseConfig = {
   Estimating: {
     Quick: {
       method: 'GetQuickEstimate',
@@ -38,17 +48,19 @@ const responses = {
   },
 };
 
-const getWSDL = (n, isSandbox) =>
+const getWSDL = (n: string, isSandbox: boolean) =>
   path.join(
     process.cwd(),
-    'node_modules/nodejs_purolator_api/',
+    'node_modules/nodejs_purolator_api/build/',
     isSandbox
       ? `./wsdl/Development/${n}Service.wsdl`
       : `./wsdl/Production/${n}Service.wsdl`
   );
 
-  module.exports = {
-    datatypes,
-    responses,
-    getWSDL
-  }
+// module.exports = {
+//   datatypes,
+//   responses,
+//   getWSDL
+// }
+
+export { datatypes, responses, getWSDL };

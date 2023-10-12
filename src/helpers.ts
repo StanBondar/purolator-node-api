@@ -1,9 +1,9 @@
-const isObject = (o) => o && typeof o === 'object';
+const isObject = (o: any) => o && typeof o === 'object';
 
-const hasProperty = (target, prop) =>
+const hasProperty = (target: object, prop: string) =>
   isObject(target) && prop in target;
 
-const invoke = (methodName, payload) => (client) => {
+export const invoke = (methodName: string, payload: any) => (client: any) => {
   if (
     !hasProperty(client, methodName) ||
     typeof client[methodName] !== 'function'
@@ -15,5 +15,3 @@ const invoke = (methodName, payload) => (client) => {
   const fn = client[methodName];
   return fn(payload);
 };
-
-module.exports = { invoke }

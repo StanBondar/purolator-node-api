@@ -1,9 +1,11 @@
-const soap = require('soap');
-const config = require('./config.js')
-const { invoke } = require("./helpers.js");
+
+import * as soap from 'soap';
+import * as config from './config.js';
+import { invoke } from "./helpers.js";
+import { ICreateShipmentRequest, IEstimateRateRequest, IRate, IRetrieveDocumentsRequest, IValidateAddressRequest } from './types/index.js';
 
 const prefix = (obj = {}, frontmatter = '') => {
-  const reassignKeyValue = (input) =>
+  const reassignKeyValue = (input: object): object =>
     Object.entries(input).reduce(
       (output, [key, value]) =>
         Object.assign(output, {
@@ -18,9 +20,12 @@ const prefix = (obj = {}, frontmatter = '') => {
   return reassignKeyValue(obj);
 };
 
-class PurolatorAPI {
-  constructor(key, password, isSandbox = true) {
-    this.version = 2;
+export default class PurolatorAPI {
+  private namespace: string;
+  private authToken: any;
+  private isSandbox: boolean;
+
+  constructor(key: string, password: string, isSandbox = true) {
     this.namespace = 'ns1';
     this.authToken = new soap.BasicAuthSecurity(
       key,
@@ -29,7 +34,7 @@ class PurolatorAPI {
     this.isSandbox = isSandbox;
   }
 
-  $appendHeaders(e, apiVersion) {
+  private $appendHeaders(e: any, apiVersion: string) {
     const [majorVersion = 2, minorVersion = 0] = apiVersion.split('.');
     const ns1 = `${config.datatypes}/v${majorVersion}`;
     const headers = prefix(
@@ -51,27 +56,7 @@ class PurolatorAPI {
     return e;
   }
 
-  async createShipment(body) {
-    return this.$req('Shipping.Create', body);
-  }
-
-  async estimateRate(body, serviceCode) {
-    const availableRates = await this.$req('Estimating.Quick', body);
-    if(serviceCode) {
-      return availableRates.find(rate => rate.ServiceID === serviceCode);
-    }
-    return availableRates;
-  }
-
-  async retrieveDocuments(body) {
-    return this.$req('ShippingDocuments.Retrieve', body);
-  }
-
-  async validateAddress(body) {
-    return this.$req('ServiceAvailability.Validate', body);
-  }
-
-  async $req(serviceName, body) {
+  private async $req(serviceName: string, body: any) {
     const payload = prefix(body, this.namespace);
     const name = config.getWSDL(serviceName.split('.')[0], this.isSandbox);
     const [responseKind, responseType] = serviceName.split('.')
@@ -101,6 +86,24 @@ class PurolatorAPI {
         console.error(err)
       });
   }
-}
 
-module.exports = { PurolatorAPI };
+  async createShipment(body: ICreateShipmentRequest) {
+    return this.$req('Shipping.Create', body);
+  }
+
+  async estimateRate(body: IEstimateRateRequest, serviceCode?: string): Promise<IRate | IRate[]> {
+    const availableRates = await this.$req('Estimating.Quick', body);
+    if(serviceCode) {
+      return availableRates.find((rate: IRate) => rate.ServiceID === serviceCode);
+    }
+    return availableRates;
+  }
+
+  async retrieveDocuments(body: IRetrieveDocumentsRequest) {
+    return this.$req('ShippingDocuments.Retrieve', body);
+  }
+
+  async validateAddress(body: IValidateAddressRequest) {
+    return this.$req('ServiceAvailability.Validate', body);
+  }
+}

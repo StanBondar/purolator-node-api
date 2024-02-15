@@ -3,17 +3,27 @@ const config = require("./config.js");
 const { invoke } = require("./helpers.js");
 
 const prefix = (obj = {}, frontmatter = "") => {
-  const reassignKeyValue = (input) =>
-    Object.entries(input).reduce(
-      (output, [key, value]) =>
-        Object.assign(output, {
+  const reassignKeyValue = (input, isArray = false) => {
+    if (isArray) {
+      return input.map((value) => {
+        return typeof value === "object"
+          ? reassignKeyValue(value, Array.isArray(value))
+          : value;
+      });
+    } else {
+      return Object.entries(input).reduce((output, [key, value]) => {
+        return Object.assign(output, {
           [`${frontmatter}:${key}`]:
-            typeof value === "object" ? reassignKeyValue(value) : value,
-        }),
-      {}
-    );
-
-  return reassignKeyValue(obj);
+            typeof value === "object"
+              ? reassignKeyValue(value, Array.isArray(value))
+              : value,
+        });
+      }, {});
+    }
+  };
+  const payload = reassignKeyValue(obj);
+  console.log(payload);
+  return payload;
 };
 
 class PurolatorAPI {
@@ -48,6 +58,10 @@ class PurolatorAPI {
 
   async createShipment(body) {
     return this.$req("Shipping.Create", body);
+  }
+
+  async cancelShipment(body) {
+    return this.$req("Shipping.Void", body);
   }
 
   async estimateRate(body, serviceCode) {

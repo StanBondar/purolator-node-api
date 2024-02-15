@@ -26,7 +26,7 @@ const responses = {
     Retrieve: {
       method: "GetDocuments",
       responseKey: "Documents.Document",
-      apiVersion: "1.3",
+      apiVersion: "1.5",
     },
   },
   ServiceAvailability: {
@@ -38,13 +38,13 @@ const responses = {
   },
 };
 
-const getWSDL = (n, isSandbox) =>
+const getWSDL = (serviceName, isSandbox) =>
   path.join(
     process.cwd(),
     'node_modules/nodejs_purolator_api/',
     isSandbox
-      ? `./wsdl/Development/${n}Service.wsdl`
-      : `./wsdl/Production/${n}Service.wsdl`
+      ? `./wsdl/Development/${serviceName}Service.wsdl`
+      : `./wsdl/Production/${serviceName}Service.wsdl`
   );
 
 module.exports = {

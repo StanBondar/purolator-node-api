@@ -19,14 +19,19 @@ const responses = {
     Create: {
       method: "CreateShipment",
       responseKey: "ShipmentPIN.Value",
-      apiVersion: "2.2",
+      apiVersion: "2.0",
+    },
+    Void: {
+      method: "VoidShipment",
+      responseKey: "ShipmentPIN.Value",
+      apiVersion: "2.0",
     },
   },
   ShippingDocuments: {
     Retrieve: {
       method: "GetDocuments",
       responseKey: "Documents.Document",
-      apiVersion: "1.5",
+      apiVersion: "1.3",
     },
   },
   ServiceAvailability: {

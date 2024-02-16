@@ -3,17 +3,21 @@ const config = require("./config.js");
 const { invoke } = require("./helpers.js");
 
 const prefix = (obj = {}, frontmatter = "") => {
-  const reassignKeyValue = (input, isArray = false) => {
+  const reassignKeyValue = (
+    input,
+    isArray = false,
+    skipfrontMatter = false
+  ) => {
     if (isArray) {
       return input.map((value) => {
         return typeof value === "object"
-          ? reassignKeyValue(value, Array.isArray(value))
+          ? reassignKeyValue(value, Array.isArray(value), true)
           : value;
       });
     } else {
       return Object.entries(input).reduce((output, [key, value]) => {
         return Object.assign(output, {
-          [`${frontmatter}:${key}`]:
+          [`${skipfrontMatter ? "" : `${frontmatter}:`}${key}`]:
             typeof value === "object"
               ? reassignKeyValue(value, Array.isArray(value))
               : value,
@@ -21,9 +25,8 @@ const prefix = (obj = {}, frontmatter = "") => {
       }, {});
     }
   };
-  const payload = reassignKeyValue(obj);
-  console.log(payload);
-  return payload;
+  
+  return reassignKeyValue(obj);
 };
 
 class PurolatorAPI {

@@ -19,7 +19,7 @@ const responses = {
     Create: {
       method: "CreateShipment",
       responseKey: "ShipmentPIN.Value",
-      apiVersion: "2.0",
+      apiVersion: "2.2",
     },
     Void: {
       method: "VoidShipment",

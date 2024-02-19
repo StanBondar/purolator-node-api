@@ -25,8 +25,9 @@ const prefix = (obj = {}, frontmatter = "") => {
       }, {});
     }
   };
-  
-  return reassignKeyValue(obj);
+  const payload = reassignKeyValue(obj);
+  console.log(payload);
+  return payload;
 };
 
 class PurolatorAPI {

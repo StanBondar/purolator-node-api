@@ -31,6 +31,13 @@ const responses = {
     Retrieve: {
       method: "GetDocuments",
       responseKey: "Documents.Document",
+      apiVersion: "1.5",
+    },
+  },
+  ShippingDocumentsDev: {
+    Retrieve: {
+      method: "GetDocuments",
+      responseKey: "Documents.Document",
       apiVersion: "1.3",
     },
   },

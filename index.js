@@ -72,6 +72,9 @@ class PurolatorAPI {
   }
 
   async retrieveDocuments(body) {
+    if(this.isSandbox) {
+      return this.$req("ShippingDocumentsDev.Retrieve", body);
+    }
     return this.$req("ShippingDocuments.Retrieve", body);
   }
 

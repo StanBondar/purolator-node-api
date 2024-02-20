@@ -1,23 +1,19 @@
 const soap = require("soap");
 const config = require("./config.js");
-const { invoke } = require("./helpers.js");
+const { invoke, objectToXML } = require("./helpers.js");
 
 const prefix = (obj = {}, frontmatter = "") => {
-  const reassignKeyValue = (
-    input,
-    isArray = false,
-    skipfrontMatter = false
-  ) => {
+  const reassignKeyValue = (input, isArray = false) => {
     if (isArray) {
       return input.map((value) => {
         return typeof value === "object"
-          ? reassignKeyValue(value, Array.isArray(value), true)
+          ? reassignKeyValue(value, Array.isArray(value))
           : value;
       });
     } else {
       return Object.entries(input).reduce((output, [key, value]) => {
         return Object.assign(output, {
-          [`${skipfrontMatter ? "" : `${frontmatter}:`}${key}`]:
+          [`${frontmatter}:${key}`]:
             typeof value === "object"
               ? reassignKeyValue(value, Array.isArray(value))
               : value,
@@ -29,7 +25,6 @@ const prefix = (obj = {}, frontmatter = "") => {
   console.log(payload);
   return payload;
 };
-
 class PurolatorAPI {
   constructor(key, password, isSandbox = true) {
     this.version = 2;
@@ -85,12 +80,20 @@ class PurolatorAPI {
   }
 
   async $req(serviceName, body) {
-    const payload = prefix(body, this.namespace);
     const name = config.getWSDL(serviceName.split(".")[0], this.isSandbox);
     const [responseKind, responseType] = serviceName.split(".");
 
     const { method, responseKey, apiVersion } =
       config.responses[responseKind][responseType];
+
+    const payload = objectToXML(
+      prefix(
+        {
+          [`${method}Request`]: body,
+        },
+        this.namespace
+      )
+    );
 
     const params = {
       returnFault: true,
@@ -99,16 +102,16 @@ class PurolatorAPI {
       overrideRootElement: {
         namespace: this.namespace,
       },
+      namespaceArrayElements: false,
     };
 
     return soap
       .createClientAsync(name, params)
       .then((e) => this.$appendHeaders(e, apiVersion))
-      .then(invoke(`${method}Async`, payload))
+      .then(invoke(`${method}Async`, { _xml: payload }))
       .then((resp) => {
         const [deepKey, deeperKey] = responseKey.split(".");
         const response = resp[0][deepKey][deeperKey];
-        console.log(`${method}:`, response);
         return response;
       })
       .catch((err) => {

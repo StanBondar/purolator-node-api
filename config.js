@@ -24,7 +24,7 @@ const responses = {
     Void: {
       method: "VoidShipment",
       responseKey: "ShipmentPIN.Value",
-      apiVersion: "2.0",
+      apiVersion: "2.2",
     },
   },
   ShippingDocuments: {
